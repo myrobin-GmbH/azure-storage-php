@@ -29,7 +29,7 @@ class ServiceRestProxy extends RestProxy
      *
      * @param string $primaryUri   The storage account
      *                             primary uri.
-     * @param string $secondaryUri The storage account
+     * @param string|null $secondaryUri The storage account
      *                             secondary uri.
      * @param string $accountName  The name of the account.
      * @param array  $options      Array of options for
@@ -42,14 +42,18 @@ class ServiceRestProxy extends RestProxy
         array $options = []
     ) {
         $primaryUri = Utilities::appendDelimiter($primaryUri, '/');
-        $secondaryUri = Utilities::appendDelimiter($secondaryUri, '/');
+
+        if ($secondaryUri !== null) {
+            $secondaryUri = Utilities::appendDelimiter($secondaryUri, '/');
+            $this->psrSecondaryUri = new Uri($secondaryUri);
+        }
 
         $dataSerializer = new XmlSerializer();
         parent::__construct($dataSerializer);
 
         $this->accountName = $accountName;
         $this->psrPrimaryUri = new Uri($primaryUri);
-        $this->psrSecondaryUri = new Uri($secondaryUri);
+
         $this->options = array_merge(['http' => []], $options);
         $this->client = self::createClient($this->options['http']);
     }
